@@ -1,3 +1,3 @@
-module example5
+module example6
 
 go 1.19

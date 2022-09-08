@@ -1,9 +1,11 @@
 package main
 
 import (
-	"example5/gee"
+	"example6/gee"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -22,6 +24,7 @@ func onlyForV2() gee.HandlerFunc {
 func main() {
 	r := gee.New()
 	r.Use(gee.Logger()) // global midlleware
+	r.Static("/myfile", "../static")
 	r.GET("/", func(c *gee.Context) {
 		c.HTML(http.StatusOK, "<h1>Hello Gee</h1>")
 	})
@@ -35,5 +38,15 @@ func main() {
 		})
 	}
 
+	file, err := os.Open("../static/index.html")
+
+	if err != nil {
+		println(err.Error())
+	}
+	data, err := io.ReadAll(file)
+	if err != nil {
+		println(err.Error())
+	}
+	println("html is : \n", string(data))
 	r.Run(":9999")
 }
