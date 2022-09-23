@@ -23,7 +23,7 @@ func main() {
 	r := gee.New()
 	r.Use(gee.Recovery())
 	r.Use(gee.Logger()) // global midlleware
-	r.Static("/myfile", "../static")
+	r.Static("/static", "../static")
 	r.GET("/", func(c *gee.Context) {
 		c.HTML(http.StatusOK, "<h1>Hello Gee</h1>")
 	})

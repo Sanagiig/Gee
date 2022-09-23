@@ -1,0 +1,142 @@
+//package group_test
+//
+//import (
+//	"bytes"
+//	"encoding/json"
+//	"finally-gi/gi"
+//	"io"
+//	"net/http"
+//	"strings"
+//	"testing"
+//)
+//
+//type httpRequest = func(url string) (resp *http.Response, err error)
+//
+//func runServer(t *testing.T, baseUrl string) {
+//	addr := ":8080"
+//	portIdx := strings.LastIndex(baseUrl, ":")
+//
+//	if portIdx != -1 {
+//		addr = baseUrl[portIdx:]
+//	}
+//
+//	g := gi.New()
+//	g.Get("/test1", func(c *gi.Context) {
+//		c.String("/test1")
+//	})
+//
+//	g.Get("/test1/test1-1", func(c *gi.Context) {
+//		c.Data([]byte("/test1-1"))
+//	})
+//
+//	g.Post("/test2", func(c *gi.Context) {
+//		c.Data([]byte("/test2"))
+//	})
+//
+//	g.Post("/test2/test2-2", func(c *gi.Context) {
+//		c.Data([]byte("/test2-2"))
+//	})
+//
+//	g.Get("/test1/json", func(ctx *gi.Context) {
+//		data := map[string]string{
+//			"xx": "123123",
+//			"yy": "3232",
+//		}
+//		ctx.Json(data)
+//	})
+//
+//	g.Get("/testParams/:x/:y/:z", func(ctx *gi.Context) {
+//		data := ctx.Params
+//		ctx.Json(data)
+//	})
+//
+//	g.Get("/testStar1/*/x/y", func(ctx *gi.Context) {
+//		ctx.String("testStar1")
+//	})
+//
+//	g.Get("/testStar2/*pp", func(ctx *gi.Context) {
+//		pp := ctx.Param("pp")
+//		ctx.String(pp)
+//	})
+//
+//	t.Fatal(g.Run(addr))
+//}
+//
+//func request(t *testing.T, reqFunc httpRequest, url string, result string) {
+//	t.Helper()
+//
+//	res, err := reqFunc(url)
+//	if err != nil {
+//		t.Fatalf("[%30s] err \n %v\n", url, err.Error())
+//	}
+//
+//	defer res.Body.Close()
+//
+//	data, err := io.ReadAll(res.Body)
+//	if err != nil {
+//		t.Fatal(err.Error())
+//	}
+//
+//	if !strings.EqualFold(string(data), result) {
+//
+//		t.Fatalf("test1 err\n expected:  \"%v\" \n get wrong data: \"%v\" \n", result, string(data))
+//	}
+//}
+//
+//func getJsonStr(t *testing.T, data any) string {
+//	buf := &bytes.Buffer{}
+//	jencode := json.NewEncoder(buf)
+//	err := jencode.Encode(data)
+//	if err != nil {
+//		t.Fatal(err.Error())
+//	}
+//
+//	d, err := io.ReadAll(buf)
+//	if err != nil {
+//		t.Fatal(err.Error())
+//	}
+//
+//	return string(d)
+//}
+//
+//func TestTire(t *testing.T) {
+//	baseUrl := "http://localhost:8080"
+//
+//	data := map[string]string{
+//		"xx": "123123",
+//		"yy": "3232",
+//	}
+//
+//	getReq := map[string]string{
+//		"/test1":         "/test1",
+//		"/test1/test1-1": "/test1-1",
+//		"/test1/json":    getJsonStr(t, data),
+//		"/testParams/xxx/yyy/zzz": getJsonStr(t, map[string]string{
+//			"x": "xxx",
+//			"y": "yyy",
+//			"z": "zzz",
+//		}),
+//		"/testStar1/qweqwe/x/y": "testStar1",
+//		"/testStar2/qq123aaa":   "qq123aaa",
+//	}
+//
+//	postReq := map[string]string{
+//		"/test2":         "/test2",
+//		"/test2/test2-2": "/test2-2",
+//	}
+//
+//	go runServer(t, baseUrl)
+//
+//	for path, result := range getReq {
+//		url := baseUrl + path
+//		request(t, http.Get, url, result)
+//	}
+//
+//	for path, result := range postReq {
+//		url := baseUrl + path
+//		request(t, func(url string) (resp *http.Response, err error) {
+//			body := &bytes.Reader{}
+//			return http.Post(url, "text/plain", body)
+//		}, url, result)
+//	}
+//}
